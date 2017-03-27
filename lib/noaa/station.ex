@@ -1,5 +1,6 @@
 defmodule NOAA.Station do
   alias NOAA.Station.XMLparser
+  alias NOAA.Station
 
   defstruct [id: "", state: "", name: "", latitude: 0.0, longitude: 0.0]
 
@@ -11,20 +12,20 @@ defmodule NOAA.Station do
     Enum.reduce(list, struct, &parse_keyword(&1, &2))
   end
 
-  defp parse_keyword({:id, id}, struct),
+  defp parse_keyword({:id, id}, struct = %Station{}),
     do: %Station{struct | id: id}
-  defp parse_keyword({:name, name}, struct),
+  defp parse_keyword({:name, name}, struct = %Station{}),
     do: %Station{struct | name: name}
-  defp parse_keyword({:state, state}, struct),
+  defp parse_keyword({:state, state}, struct = %Station{}),
     do: %Station{struct | state: state}
-  defp parse_keyword({:latitude, latitude}, struct),
+  defp parse_keyword({:latitude, latitude}, struct = %Station{}),
     do: %Station{struct | latitude: latitude}
-  defp parse_keyword({:longitude, longitude}, struct),
+  defp parse_keyword({:longitude, longitude}, struct = %Station{}),
     do: %Station{struct | longitude: longitude}
-  defp parse_keyword(_, struct),
+  defp parse_keyword(_, struct = %Station{}),
     do: struct
 
-  def fill_the_gaps(struct) do
+  def fill_the_gaps(struct = %Station{}) do
     empty_keys = for key <- Map.keys(struct),
                      not Map.get(struct, key) in [0.0, ""],
                   do: key
