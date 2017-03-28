@@ -31,6 +31,7 @@ defmodule Noaa.Mixfile do
   defp deps do
     [
       {:httpoison, "~> 0.11.1"},
+      {:sweet_xml, "~> 0.6.5"},
       {:ex_doc, "~> 0.15.0"}
     ]
   end

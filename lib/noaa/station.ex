@@ -26,9 +26,9 @@ defmodule NOAA.Station do
     do: struct
 
   def fill_the_gaps(struct = %Station{}) do
-    empty_keys = for key <- Map.keys(struct),
+    given_keys = for key <- Map.keys(struct),
                      not Map.get(struct, key) in [0.0, ""],
                   do: key
-    XMLparser.find_values(struct, empty_keys)
+    XMLparser.find_missing_values(struct, given_keys)
   end
 end

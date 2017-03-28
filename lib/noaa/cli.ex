@@ -1,4 +1,5 @@
 defmodule NOAA.CLI do
+  import NOAA.Station, only: [parse_keywords: 2]
   alias NOAA.Station
 
   def main(argv) do
@@ -30,11 +31,11 @@ defmodule NOAA.CLI do
       {[help: true], _, _}
         -> :help
       {list, [], _}
-        -> Station.parse_keywords(list, %Station{})
+        -> parse_keywords(list, %Station{})
       {list, id_or_name, _}
         -> if String.length(id_or_name) > 4,
-            do:   Station.parse_keywords(list, %Station{name: id_or_name}),
-            else: Station.parse_keywords(list, %Station{id: id_or_name})
+            do:   parse_keywords(list, %Station{name: id_or_name}),
+            else: parse_keywords(list, %Station{id: id_or_name})
        _
         -> :help
     end
