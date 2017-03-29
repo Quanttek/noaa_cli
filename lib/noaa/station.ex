@@ -2,6 +2,8 @@ defmodule NOAA.Station do
   alias NOAA.Station.XMLparser
   alias NOAA.Station
 
+  @derive Access
+
   defstruct [id: "", state: "", name: "", latitude: 0.0, longitude: 0.0]
 
   def parse_keywords([], struct) do
