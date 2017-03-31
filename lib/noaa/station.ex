@@ -1,8 +1,6 @@
 defmodule NOAA.Station do
-  alias NOAA.Station.XMLparser
+  alias NOAA.Station.XMLParser
   alias NOAA.Station
-
-  @derive Access
 
   defstruct [id: "", state: "", name: "", latitude: 0.0, longitude: 0.0]
 
@@ -27,10 +25,11 @@ defmodule NOAA.Station do
   defp parse_keyword(_, struct = %Station{}),
     do: struct
 
-  def fill_the_gaps(struct = %Station{}) do
-    given_keys = for key <- Map.keys(struct),
-                     not Map.get(struct, key) in [0.0, ""],
-                  do: key
-    XMLparser.find_missing_values(struct, given_keys)
+  def get_matching_stations(user_input_struct = %Station{}) do
+    user_input_struct
+    |> Map.from_struct()
+    |> Enum.filter(fn {_key, value} -> not value in ["", 0.0] end)
+    |> Enum.into(%{})
+    |> XMLParser.match_user_input_to_stations()
   end
 end

@@ -1,12 +1,13 @@
-defmodule NOAA.Station.XMLparser do
+defmodule NOAA.Station.XMLParser do
   alias NOAA.Station
   import SweetXml
   require Logger
 
-  #See station struct
-  def find_missing_values(struct = %Station{}, keys) do
+  def match_user_input_to_stations(user_input_map) do
     {:ok, xml_string} = NOAA.WebHandler.fetch_list
     station_list = parse_station_list(xml_string)
+
+    get_fully_matching_stations(station_list, user_input_map)
   end
 
   def parse_station_list(xml_string) do
@@ -23,48 +24,74 @@ defmodule NOAA.Station.XMLparser do
     end)
   end
 
-  def get_matching_stations(station_list, {key, value}) do
-    for station <- station_list,
-        not station[key] in ["", 0.0],
-        do: match_station_for_value(station, {key, value})
+  def get_fully_matching_stations(station_list, key_map)
+    when map_size(key_map) == 0 do
+    station_list
   end
 
-  def get_matching_stations(station_list, [latitude: latitude, longitude: longitude]) do
+  def get_fully_matching_stations(station_list, key_map =
+      %{latitude: latitude, longitude: longitude}) do
+    key_map = key_map
+    |> Map.delete(:latitude)
+    |> Map.delete(:longitude)
+
+    station_list
+    |> get_key_matching_stations([latitude: latitude, longitude: longitude])
+    |> List.flatten
+    |> get_fully_matching_stations(key_map)
+  end
+
+  def get_fully_matching_stations(station_list, key_map) do
+    key = List.first(Map.keys(key_map))
+    {value, key_map} = Map.pop(key_map, key)
+
+    station_list
+    |> get_key_matching_stations([{key, value}])
+    |> List.flatten
+    |> get_fully_matching_stations(key_map)
+  end
+
+  def get_key_matching_stations(station_list, [{key, value}]) do
+    Enum.map(station_list, &match_station_for_value(&1, [{key, value}]))
+  end
+
+  def get_key_matching_stations(station_list, [latitude: latitude, longitude: longitude]) do
     for station <- station_list,
-        match_station_for_value(station, {:latitude, latitude}),
-        match_station_for_value(station, {:longitude, longitude})
+        match_station_for_value(station, [latitude: latitude]),
+        match_station_for_value(station, [longitude: longitude]),
         do: station
   end
 
-  def match_station_for_value(station, {:id, value}) when station[:id] == value do
-    station
+  defp match_station_for_value(station = %Station{}, [id: value]) do
+    if station.id == value, do: station
   end
 
-  def match_station_for_value(station, {:state, value}) do
-    case value do
-      station[:state] when String.length(value) == 2 #When the user uses state abbreviations
+  defp match_station_for_value(station = %Station{}, [state: value]) do
+    state = station.state
+    cond do
+      state == value and String.length(value) == 2 #When the user uses state abbreviations
         -> station
-      match_abbr_to_state(station[:state])
+      match_abbr_to_state(station.state) == value
         -> station
+      true
+        -> nil
     end
   end
 
-  def match_station_for_value(station, {:name, value}) do
-    if String.match?(value, ~r{#{station[:name]}}) do
-      station
-    end
+  defp match_station_for_value(station = %Station{}, [name: value]) do
+    if String.match?(value, ~r{#{station.name}}), do: station
   end
 
-  def match_station_for_value(station, {:latitude, value}) do
-    if abs(station[:latitude] - value <= 1.0) do
-      station
-    end
+  defp match_station_for_value(station = %Station{}, [latitude: value]) do
+    if abs(station.latitude - value <= 1.0), do: station
   end
 
-  def match_station_for_value(station, {:longitude, value}) do
-    if abs(station[:longitude] - value <= 1.0) do
-      station
-    end
+  defp match_station_for_value(station = %Station{}, [longitude: value]) do
+    if abs(station.longitude - value <= 1.0), do: station
+  end
+
+  defp match_station_for_value(_station, _key_and_value) do
+    nil
   end
 
   defp match_abbr_to_state(abbr) do
