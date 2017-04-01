@@ -15,11 +15,11 @@ defmodule NOAA.Station.XMLParser do
     |> xpath(~x"//station"l)
     |> Enum.map(fn(station) ->
       %Station{
-        id: xpath(station, ~x"./station_id/text()"),
-        state: xpath(station, ~x"./state/text()"),
-        name: xpath(station, ~x"./station_name/text()"),
-        latitude: xpath(station, ~x"./latitude/text()"),
-        longitude: xpath(station, ~x"./longitude/text()"),
+        id: xpath(station, ~x"./station_id/text()") |> to_string,
+        state: xpath(station, ~x"./state/text()") |> to_string,
+        name: xpath(station, ~x"./station_name/text()") |> to_string,
+        latitude: xpath(station, ~x"./latitude/text()") |> List.to_float,
+        longitude: xpath(station, ~x"./longitude/text()") |> List.to_float,
       }
     end)
   end
@@ -52,7 +52,7 @@ defmodule NOAA.Station.XMLParser do
   end
 
   def get_key_matching_stations(station_list, [{key, value}]) do
-    Enum.map(station_list, &match_station_for_value(&1, [{key, value}]))
+    Enum.filter(station_list, &match_station_for_value(&1, [{key, value}]))
   end
 
   def get_key_matching_stations(station_list, [latitude: latitude, longitude: longitude]) do
@@ -83,11 +83,11 @@ defmodule NOAA.Station.XMLParser do
   end
 
   defp match_station_for_value(station = %Station{}, [latitude: value]) do
-    if abs(station.latitude - value <= 1.0), do: station
+    if abs(station.latitude - value) <= 1.0, do: station
   end
 
   defp match_station_for_value(station = %Station{}, [longitude: value]) do
-    if abs(station.longitude - value <= 1.0), do: station
+    if abs(station.longitude - value) <= 1.0, do: station
   end
 
   defp match_station_for_value(_station, _key_and_value) do
@@ -147,15 +147,27 @@ defmodule NOAA.Station.XMLParser do
       "WV" => "West Virginia",
       "WI" => "Wisconsin",
       "WY" => "Wyoming",
+      #U.S. Territories
       "AS" => "American Samoa",
       "GU" => "Guam",
       "MP" => "Northern Mariana Islands",
       "PR" => "Puerto Rico",
       "VI" => "U.S. Virgin Islands",
-      "UM" => "U.S. Minor Outlying Islands",
-      "FM" => "Micronesia",
-      "MH" => "Marshall Islands",
-      "PW" => "Palau"
+      "UM" => "U.S. Minor Outlying Islands", #Currently no stations exist here
+      #Canada
+      "AB" => "Alberta",
+      "BC" => "British Columbia",
+      "MB" => "Manitoba",
+      "NB" => "New Brunswick",
+      "NF" => "Newfoundland and Labrador",
+      "NS" => "Nova Scotia",
+      "NT" => "Northwest Territories",
+      "NU" => "Nunavut",
+      "ON" => "Ontario",
+      "PE" => "Prince Edward Island",
+      "QC" => "Quebec",
+      "SK" => "Saskatchewan",
+      "YT" => "Yukon",
     }
     case Map.fetch(abbr_to_state, abbr) do
       {:ok, state} -> state
