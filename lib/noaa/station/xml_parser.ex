@@ -18,8 +18,8 @@ defmodule NOAA.Station.XMLParser do
         id: xpath(station, ~x"./station_id/text()") |> to_string,
         state: xpath(station, ~x"./state/text()") |> to_string,
         name: xpath(station, ~x"./station_name/text()") |> to_string,
-        latitude: xpath(station, ~x"./latitude/text()") |> List.to_float,
-        longitude: xpath(station, ~x"./longitude/text()") |> List.to_float,
+        latitude: xpath(station, ~x"./latitude/text()") |> list_to_num,
+        longitude: xpath(station, ~x"./longitude/text()") |> list_to_num,
       }
     end)
   end
@@ -92,6 +92,14 @@ defmodule NOAA.Station.XMLParser do
 
   defp match_station_for_value(_station, _key_and_value) do
     nil
+  end
+
+  defp list_to_num(list) when is_list(list) do
+    if Enum.any?(list, &(&1 == 46)) do
+      List.to_float(list)
+    else
+      List.to_integer(list)
+    end
   end
 
   defp match_abbr_to_state(abbr) do

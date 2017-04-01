@@ -5,7 +5,7 @@ defmodule NOAA.CLI do
   def main(argv) do
     argv
     |> parse_args
-    |> Station.get_matching_stations
+    |> Station.get_matching
   end
 
   #Users should be able to pass the following args: state, name, abbreviation, coordinates
