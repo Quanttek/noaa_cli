@@ -40,4 +40,24 @@ defmodule NOAA.CLI do
         -> :help
     end
   end
+
+  def process(:help) do
+    IO.puts """
+    #{Keyword.get(Mix.Project.config(), :name)}
+    Matches the user input to a (list of) NOAA weather station(s).
+    If only one station matches displays weather, else displays a list of stations
+    ******************************
+    Usage:
+      noaa [(id | name) | options]
+      noaa (id | name) options
+
+    Options:
+      -h  --help      Displays this help text
+      -i  --id        Takes a station's id
+      -s  --state     Either takes an ANSI abbreviation or the name of an U.S. or Canadian state
+      -n  --name      Takes a complete name of a station
+      -t  --latitude  Takes a signed number with values < 0 for south and values > 0 for north
+      -g  --longitude Takes a signed number with values < 0 for west and values > 0 for east
+    """
+  end
 end

@@ -30,7 +30,7 @@ defmodule StationTest.XMLParserTest do
     assert(parse_station_list(xml_string) == expected_result)
   end
 
-  #Test exists to a) check the string_to_num func and be sure formatting changes will not affect results
+  #Test exists to a) check the string_to_num func and b) be sure formatting changes will not affect results
   test "Get correct %Station{} struct for clean xml snippet string of station list (2/2)" do
     xml_string = "<station><station_id>PABI</station_id><state>AK</state><station_name>Delta Junction/Ft Greely, Allen Army Airfield</station_name><latitude>64</latitude><longitude>-145.73333</longitude><html_url>http://weather.noaa.gov/weather/current/PABI.html</html_url><rss_url>http://weather.gov/xml/current_obs/PABI.rss</rss_url><xml_url>http://weather.gov/xml/current_obs/PABI.xml</xml_url></station>"
     expected_result = [%Station{id: "PABI", state: "AK", name: "Delta Junction/Ft Greely, Allen Army Airfield",

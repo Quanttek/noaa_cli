@@ -5,7 +5,7 @@ defmodule Noaa.Mixfile do
     [app: :noaa,
      version: "0.1.0",
      elixir: "~> 1.4",
-     name: "NOAA weather",
+     name: "NOAA CLI Weather",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps()]
