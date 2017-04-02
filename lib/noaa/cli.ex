@@ -44,9 +44,10 @@ defmodule NOAA.CLI do
   def process(:help) do
     IO.puts """
     #{Keyword.get(Mix.Project.config(), :name)}
+
     Matches the user input to a (list of) NOAA weather station(s).
     If only one station matches displays weather, else displays a list of stations
-    ******************************
+
     Usage:
       noaa [(id | name) | options]
       noaa (id | name) options
@@ -59,5 +60,11 @@ defmodule NOAA.CLI do
       -t  --latitude  Takes a signed number with values < 0 for south and values > 0 for north
       -g  --longitude Takes a signed number with values < 0 for west and values > 0 for east
     """
+  end
+
+  def process(struct = %Station{}) do
+    struct
+    |> Station.get_matching()
+    
   end
 end
