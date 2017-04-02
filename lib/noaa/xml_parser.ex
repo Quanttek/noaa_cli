@@ -24,7 +24,7 @@ defmodule NOAA.XMLParser do
     |> fn(station) ->
       %Weather{
         last_updated: xpath(station, ~x"./tr[2]/td[2]/text()[1]")
-          |> to_string() |> del_half(",", :left), #TODO: Get real timestamp and display "x minutes ago"
+          |> to_string() |> del_half(",", :left),                 #TODO: Get real timestamp and display "x minutes ago"
         weather: xpath(station, ~x"./tr[3]/td[2]/text()")
           |> to_string() |> del_half("(", :right) |> trim,
         temp: xpath(station, ~x"./tr[4]/td[2]/text()")
