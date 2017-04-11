@@ -61,7 +61,7 @@ defmodule NOAA.Station do
   end
 
   def get_fully_matching(station_list, key_map) do
-    key = List.first(Map.keys(key_map))
+    key = key_map |> Map.keys() |> List.first()
     {value, key_map} = Map.pop(key_map, key)
 
     station_list

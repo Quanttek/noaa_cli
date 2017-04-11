@@ -21,22 +21,22 @@ defmodule NOAA.XMLParser do
   def parse_station(html_string) do
     html_string
     |> xpath(~x"//body/table/tbody/tr/td[2]/table[1]/tbody/tr/td[2]/table/tbody/")
-    |> fn(station) ->
+    |> (fn(station) ->
       %Weather{
         last_updated: xpath(station, ~x"./tr[2]/td[2]/text()[1]")
           |> to_string() |> del_half(",", :left),                 #TODO: Get real timestamp and display "x minutes ago"
         weather: xpath(station, ~x"./tr[3]/td[2]/text()")
-          |> to_string() |> del_half("(", :right) |> trim,
+          |> to_string() |> del_half("(", :right) |> String.trim,
         temp: xpath(station, ~x"./tr[4]/td[2]/text()")
           |> to_string() |> del_half(" ", :right) |> string_to_num(),
         humidity: xpath(station, ~x"./tr[6]/td[2]/text()")
           |> to_string() |> del_half(" ", :right) |> string_to_num(),
         wind: xpath(station, ~x"./tr[7]/td[2]/text()")
-          |> to_string() |> del_half("(", :right) |> trim,
+          |> to_string() |> del_half("(", :right) |> String.trim,
         msl_pressure: xpath(station, ~x"./tr[10]/td[2]/text()")
           |> to_string() |> del_half(" ", :right) |> string_to_num(),
       }
-    end
+    end).()
   end
 
   defp list_to_num(list) when is_list(list) do

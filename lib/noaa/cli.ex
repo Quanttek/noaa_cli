@@ -59,12 +59,15 @@ defmodule NOAA.CLI do
       -n  --name      Takes a complete name of a station
       -t  --latitude  Takes a signed number with values < 0 for south and values > 0 for north
       -g  --longitude Takes a signed number with values < 0 for west and values > 0 for east
+
+    When providing latitude or longitude values (or both) a station only matches
+    if it is less than one degree away
     """
   end
 
   def process(struct = %Station{}) do
     struct
     |> Station.get_matching()
-    
+
   end
 end
