@@ -3,8 +3,8 @@ defmodule NOAA.Weather do
   alias NOAA.XMLParser
   alias NOAA.Weather
 
-  defstruct [last_updated: "", weather: "", temp: 0.0, humidity: 0.0,
-             wind: "", msl_pressure: 0.0]
+  defstruct [last_updated: "", weather: "", temp: "", humidity: "",
+             wind: "", msl_pressure: ""]
 
   def get_struct(%Station{id: id}) do
     {:ok, weather_html} = NOAA.WebHandler.fetch(id)
@@ -45,7 +45,7 @@ defmodule NOAA.Weather do
         -> "💨" #Emoji: Dashing Away
       Regex.match?(~r{(Dust|Sand)}, weather)
         -> "💨" #Emoji: Dashing Away
-      true -> "  "
+      true -> "-"
     end
   end
 end

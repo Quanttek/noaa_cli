@@ -10,8 +10,8 @@ defmodule NOAA.XMLParser do
     |> Enum.map(fn station ->
       %Station{
         id:         xpath(station, ~x"./station_id/text()")   |> to_string(),
-        state:      xpath(station, ~x"./state/text()")        |> to_string(),
         name:       xpath(station, ~x"./station_name/text()") |> to_string(),
+        state:      xpath(station, ~x"./state/text()")        |> to_string(),
         latitude:   xpath(station, ~x"./latitude/text()")     |> list_to_num(),
         longitude:  xpath(station, ~x"./longitude/text()")    |> list_to_num(),
       }
@@ -24,17 +24,17 @@ defmodule NOAA.XMLParser do
     |> (fn(station) ->
       %Weather{
         last_updated: xpath(station, ~x"./tr[2]/td[2]/text()[1]")
-          |> to_string() |> del_half(",", :left),                 #TODO: Get real timestamp and display "x minutes ago"
+          |> to_string() |> del_half(",", :left) |> String.trim(),   #TODO: Get real timestamp and display "x minutes ago"
         weather: xpath(station, ~x"./tr[3]/td[2]/text()")
-          |> to_string() |> del_half("(", :right) |> String.trim,
+          |> to_string() |> del_half("(", :right) |> String.trim(),
         temp: xpath(station, ~x"./tr[4]/td[2]/text()")
-          |> to_string() |> del_half(" ", :right) |> string_to_num(),
+          |> to_string() |> del_half(" ", :right) |> String.trim(),
         humidity: xpath(station, ~x"./tr[6]/td[2]/text()")
-          |> to_string() |> del_half(" ", :right) |> string_to_num(),
+          |> to_string() |> del_half(" ", :right) |> String.trim(),
         wind: xpath(station, ~x"./tr[7]/td[2]/text()")
-          |> to_string() |> del_half("(", :right) |> String.trim,
+          |> to_string() |> del_half("(", :right) |> String.trim(),
         msl_pressure: xpath(station, ~x"./tr[10]/td[2]/text()")
-          |> to_string() |> del_half(" ", :right) |> string_to_num(),
+          |> to_string() |> del_half(" ", :right) |> String.trim(),
       }
     end).()
   end

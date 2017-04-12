@@ -5,21 +5,6 @@ defmodule XMLParserTest do
   alias NOAA.Station
   import NOAA.XMLParser, only: [parse_station_list: 1]
 
-  def station_list do
-    [%Station{id: "CWAV", state: "AB", name: "Sundre",
-      latitude: 51.76667, longitude: -114.68333},
-    %Station{id: "CWDZ", state: "AB", name: "Drumheller East",
-      latitude: 51.44504, longitude: -112.69654}, #longitude value is modified
-    %Station{id: "KFME", state: "MD", name: "Fort Meade / Tipton",
-      latitude: 39.08333, longitude: -76.76667},
-    %Station{id: "KMTN", state: "MD", name: "Baltimore / Martin",
-      latitude: 39.33333, longitude: -76.41667},
-    %Station{id: "KMSO", state: "MT", name: "Missoula, Missoula International Airport",
-      latitude: 46.92083, longitude: -114.0925},
-    %Station{id: "KDOV", state: "DE", name: "Dover Air Force Base",
-      latitude: 39.13333, longitude: -75.46667}]
-  end
-
   test "Get correct %Station{} struct for dirty xml snippet string of station list (1/2)" do
     xml_string = "\t<station>\n\t\t<station_id>CWAV</station_id>\n\t\t<state>AB</state>\n            \t<station_name>Sundre</station_name>\n\t\t<latitude>51.76667</latitude>\n\t\t<longitude>-114.68333</longitude>\n            \t<html_url>http://weather.noaa.gov/weather/current/CWAV.html</html_url>\n            \t<rss_url>http://weather.gov/xml/current_obs/CWAV.rss</rss_url>\n            \t<xml_url>http://weather.gov/xml/current_obs/CWAV.xml</xml_url>\n\t</station>\n\n"
     expected_result = [%Station{id: "CWAV", state: "AB", name: "Sundre",

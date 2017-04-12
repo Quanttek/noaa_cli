@@ -2,12 +2,12 @@ defmodule NOAA.Format do
   alias NOAA.Weather
   alias NOAA.Station
 
-  @labels_station %{id: "#", state: "State", name: "Name",
-    latitude: "Latitude (N)", longitude: "Longitude (E)"}
-  @labels_weather %{last_updated: "Updated at", weather: "Weather",
-    temp: "Temp. (in °F)", humidity: "Humidity (in %)", wind: "Wind",
-    msl_pressure: "MSL Pressure (in mbar)"}
-  @total_width 120
+  @labels_station [id: "#", name: "Name", state: "State",
+    latitude: "Latitude", longitude: "Longitude"]
+  @labels_weather [last_updated: "Updated at", weather: "Weather",
+    temp: "Temp. (°F)", humidity: "Humidity (%)", wind: "Wind",
+    msl_pressure: "MSL Pressure (mbar)"]
+  @total_width 100
   @separator " | "
 
   def create_row_list(list) do
@@ -35,21 +35,31 @@ defmodule NOAA.Format do
   end
 
   #TODO: Maybe create a case where list = list but length don't match. Needed??
-  defp do_fix_cell_width(list, _widths) do
-    list
+  defp do_fix_cell_width(string, _widths) when is_bitstring(string) do
+    adjust_string_length(string, @total_width)
   end
 
   def create_table_list([station = %Station{}, weather = %Weather{}]) do
-    weather = Map.from_struct(weather)
-    weather_list = Enum.zip(Map.keys(weather), Map.values(weather))
-      |> Enum.map(fn {key, value} -> [key, value] end)
+    weather_list = @labels_weather
+      |> Keyword.keys()
+      |> Enum.map(&( [&1, Map.fetch!(weather, &1)] )) #label-value pair
+      |> Enum.filter(fn([_key, value]) -> value != nil end)
       |> add_labels()
     station_list = create_table_list(station)
+
     [station_list, get_emoji_separator(weather) | weather_list]
   end
 
   def create_table_list(station = %Station{}) do
-    Map.values(station)
+    keys = @labels_station |> Keyword.keys()
+    for key <- keys do
+      value = Map.fetch!(station, key)
+      case key do
+        :latitude   -> num_to_coordinates(value, :lat)
+        :longitude  -> num_to_coordinates(value, :long)
+        _ -> value
+      end
+    end
   end
 
   def create_table_list(station_list) when is_list(station_list) do
@@ -67,11 +77,11 @@ defmodule NOAA.Format do
 
   def add_labels(weather_list) do
     Enum.map(weather_list, fn([key, value]) ->
-      {@labels_weather[key], value}
+      [@labels_weather[key], value]
     end)
   end
 
-  def get_emoji_separator(%Weather{weather: weather}) do
+  def get_emoji_separator(weather = %Weather{}) do
     Weather.get_emoji(weather)
     |> List.duplicate(@total_width)
     |> Enum.join("")
@@ -88,8 +98,11 @@ defmodule NOAA.Format do
   defp get_max_column_widths(table_list) do
     #Uses the first element to determine the number of columns. May need change TODO
     num_of_col = table_list |> List.first |> length
-    for index <- 0..num_of_col do
-      Enum.max_by(table_list, &get_length_of_nth_elem(&1, index))
+    for index <- 0..num_of_col-1 do
+      table_list
+      |> Enum.max_by(&get_length_of_nth_elem(&1, index)) #Returns the whole sub_list
+      |> Enum.at(index)
+      |> String.length()
     end
   end
 
@@ -119,5 +132,17 @@ defmodule NOAA.Format do
       {left, _right} = String.split_at(string, -length)
       left
     end
+  end
+
+  defp num_to_coordinates(num, :lat) do
+    if num >= 0,
+      do: to_string(num) <> " N",
+    else: (num |> to_string() |> String.trim("-")) <> " S"
+  end
+
+  defp num_to_coordinates(num, :long) do
+    if num >= 0,
+      do: to_string(num) <> " E",
+    else: (num |> to_string() |> String.trim("-")) <> " W"
   end
 end

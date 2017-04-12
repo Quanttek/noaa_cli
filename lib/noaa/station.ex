@@ -4,7 +4,7 @@ defmodule NOAA.Station do
   alias NOAA.XMLParser
   alias NOAA.Station
 
-  defstruct [id: "", state: "", name: "", latitude: 0.0, longitude: 0.0]
+  defstruct [id: "", name: "", state: "", latitude: 0.0, longitude: 0.0]
 
   #TODO: Refactor: Don't return partially filled station, but instead a map
   def parse_keywords([], struct = %Station{}) do
@@ -78,39 +78,45 @@ defmodule NOAA.Station do
     for station <- station_list,
         match_for_key_value(station, [latitude: latitude]),
         match_for_key_value(station, [longitude: longitude]),
-        do: station
+      do: station
   end
 
-  defp match_for_key_value(station = %Station{}, [id: value]) do
-    if station.id == value, do: station
+  defp match_for_key_value(station = %Station{}, [id: user_value]) do
+    if station.id == user_value, do: station
   end
 
-  defp match_for_key_value(station = %Station{}, [state: value]) do
+  defp match_for_key_value(station = %Station{}, [state: user_value]) do
     state = station.state
     cond do
-      state == value and String.length(value) == 2 #When the user uses state abbreviations
+      state == user_value and String.length(user_value) == 2 #When the user uses state abbreviations
         -> station
-      match_abbr_to_state(station.state) == value
+      match_abbr_to_state(station.state) == user_value
         -> station
       true
         -> nil
     end
   end
 
-  defp match_for_key_value(station = %Station{}, [name: value]) do
-    if String.match?(value, ~r{#{station.name}}), do: station
+  defp match_for_key_value(station = %Station{}, [name: user_value]) do
+    if String.match?(user_value, ~r{#{station.name}}), do: station
   end
 
-  defp match_for_key_value(station = %Station{}, [latitude: value]) do
-    if abs(station.latitude - value) <= 1.0, do: station
+  defp match_for_key_value(station = %Station{}, [latitude: user_value]) do
+    if abs(station.latitude - user_value) <= 1.0,
+      do: station
   end
 
-  defp match_for_key_value(station = %Station{}, [longitude: value]) do
-    if abs(station.longitude - value) <= 1.0, do: station
+  defp match_for_key_value(station = %Station{}, [longitude: user_value]) do
+    if abs(station.longitude - user_value) <= 1.0,
+      do: station
   end
 
   defp match_for_key_value(_station, _key_and_value) do
     nil
+  end
+
+  defp remove_nils(list) do
+    Enum.filter(list, &(&1 != nil))
   end
 
   defp match_abbr_to_state(abbr) do
