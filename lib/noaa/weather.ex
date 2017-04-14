@@ -11,7 +11,7 @@ defmodule NOAA.Weather do
     XMLParser.parse_station(weather_html)
   end
 
-  def get_emoji(%Weather{weather: weather}) do #This is so ugly
+  def get_emoji(weather) do #This is so ugly
     cond do
       Regex.match?(~r{Overcast}, weather)
         -> "☁️" #Emoji: Cloud
