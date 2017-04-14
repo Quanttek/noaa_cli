@@ -1,6 +1,6 @@
-defmodule NOAA.Format do
-  alias NOAA.Weather
-  alias NOAA.Station
+defmodule Noaa.Format do
+  alias Noaa.Weather
+  alias Noaa.Station
 
   @labels_station [id: "#", name: "Name", state: "State",
     latitude: "Latitude", longitude: "Longitude"]
@@ -121,12 +121,12 @@ defmodule NOAA.Format do
 
 
   def add_header(station_list) do
-    keys = %NOAA.Station{} |> Map.from_struct() |> Map.keys()
+    keys = %Noaa.Station{} |> Map.from_struct() |> Map.keys()
     widths = station_list |> List.first() |> Enum.map(&String.length/1)
 
-    Enum.map(keys, &(@labels_station[&1]))
-      ++ get_header_separator(widths)
-      ++ station_list
+    [Enum.map(keys, &(@labels_station[&1])),
+     get_header_separator(widths),
+     station_list]
   end
 
   def add_header(weather_list, station = %Station{}, weather_string) do
@@ -143,8 +143,8 @@ defmodule NOAA.Format do
   end
 
   def get_header_separator(widths) do
-    for width <- widths,
-      do: String.pad_trailing("", width, @row_separator)
+    for(width <- widths,
+      do: String.pad_trailing("", width, @row_separator))
     |> Enum.join(@row_col_junction)
   end
 

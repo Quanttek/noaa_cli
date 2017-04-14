@@ -1,7 +1,9 @@
-defmodule NOAA.XMLParser do
-  alias NOAA.Station
-  alias NOAA.Weather
+defmodule Noaa.XMLParser do
   import SweetXml
+
+  alias Noaa.Station
+  alias Noaa.Weather
+
   require Logger
 
   def parse_station_list(xml_string) do
@@ -18,9 +20,34 @@ defmodule NOAA.XMLParser do
     end)
   end
 
-  def parse_station(html_string) do
+  def parse_station(xml_string) do
+    xml_string
+    |> xpath(~x"//current_observation")
+    |> (fn(station) ->
+      %Weather{
+        last_updated: xpath(station, ~x"./observation_time/text()")
+          |> to_string() |> del_half(",", :left) |> String.trim(),
+        weather: xpath(station, ~x"./weather/text()")
+          |> to_string(),
+        temp: xpath(station, ~x"./temp_f/text()")
+          |> to_string(),
+        humidity: xpath(station, ~x"./relative_humidity/text()")
+          |> to_string(),
+        wind: "#{xpath(station, ~x"./wind_dir/text()")
+        |> to_string()} at #{xpath(station, ~x"./wind_mph/text()")
+        |> to_string()} MPH",
+        #alternative:
+        #xpath(station, ~x"./wind_string/text()")
+        #  |> to_string() |> del_half("(", :right) |> String.trim(),
+        msl_pressure: xpath(station, ~x"./pressure_mb/text()")
+          |> to_string(),
+        }
+      end).()
+  end
+
+  def parse_station_html(html_string) do #Old: Uses document displayed by browser, but access to xml is possible
     html_string
-    |> xpath(~x"//body/table/tbody/tr/td[2]/table[1]/tbody/tr/td[2]/table/tbody/")
+    |> xpath(~x"//body/table/tbody/tr/td[2]/table[1]/tbody/tr/td[2]/table/tbody")
     |> (fn(station) ->
       %Weather{
         last_updated: xpath(station, ~x"./tr[2]/td[2]/text()[1]")

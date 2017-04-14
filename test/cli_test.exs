@@ -2,8 +2,8 @@ defmodule CliTest do
   use ExUnit.Case
   #doctest Noaa
 
-  alias NOAA.Station
-  import NOAA.CLI, only: [parse_args: 1]
+  alias Noaa.Station
+  import Noaa.CLI, only: [parse_args: 1]
 
   test ":help returned by option parsing with -h and --help options" do
     assert(parse_args(["-h",     "anything"]) == :help)

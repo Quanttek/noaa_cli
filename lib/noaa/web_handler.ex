@@ -1,4 +1,4 @@
-defmodule NOAA.WebHandler do
+defmodule Noaa.WebHandler do
   require Logger
 
   @user_agent [ {"User-agent", "Elixir-based weather client"}]
@@ -16,6 +16,16 @@ defmodule NOAA.WebHandler do
     xml_url()
     |> HTTPoison.get(@user_agent)
     |> handle_response
+  end
+
+  def decode_response({:ok, body}) do
+    body
+  end
+
+  def decode_response({:error, error}) do
+    {_, message} = List.keyfind(error, "Message", 0)
+    IO.puts "Error fetching from Noaa servers: #{message}"
+    System.halt(2)
   end
 
   def xml_url() do

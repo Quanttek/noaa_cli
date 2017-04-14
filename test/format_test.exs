@@ -1,13 +1,13 @@
 defmodule FormatTest do
   use ExUnit.Case
 
-  import NOAA.Format, only: [fix_cell_widths: 1,
+  import Noaa.Format, only: [fix_cell_widths: 1,
                              create_station_list: 1,
                              create_weather_list: 1,
                              create_table: 1]
 
-  alias NOAA.Station
-  alias NOAA.Weather
+  alias Noaa.Station
+  alias Noaa.Weather
 
   test "Create correct weather table" do
     list = [%Station{id: "KFME", state: "MD", name: "Fort Meade / Tipton",

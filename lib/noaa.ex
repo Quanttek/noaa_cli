@@ -1,18 +1,21 @@
 defmodule Noaa do
-  @moduledoc """
-  Documentation for Noaa.
-  """
+  alias Noaa.Weather
+  alias Noaa.Station
 
-  @doc """
-  Hello world.
+  require Logger
 
-  ## Examples
+  def decide_output([station = %Station{}]) do
+    Logger.info "Only one station matched. Getting weather..."
+    weather = Weather.get_struct(station)
+    [station, weather]
+  end
 
-      iex> Noaa.hello
-      :world
+  def decide_output([]) do
+    Logger.error "Could not find any stations matching your criteria!"
+    System.halt(2)
+  end
 
-  """
-  def hello do
-    :world
+  def decide_output(station_list) do
+    station_list
   end
 end

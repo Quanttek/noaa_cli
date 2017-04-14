@@ -1,8 +1,11 @@
-defmodule NOAA.Station do
-  require Logger
+defmodule Noaa.Station do
+  import Noaa.WebHandler, only: [fetch_list: 0,
+                                 decode_response: 1]
 
-  alias NOAA.XMLParser
-  alias NOAA.Station
+  alias Noaa.XMLParser
+  alias Noaa.Station
+
+  require Logger
 
   defstruct [id: "", name: "", state: "", latitude: 0.0, longitude: 0.0]
 
@@ -37,7 +40,7 @@ defmodule NOAA.Station do
   end
 
   def match_user_input_to_stations(user_input_map) do
-    {:ok, xml_string} = NOAA.WebHandler.fetch_list
+    xml_string = fetch_list() |> decode_response()
     station_list = XMLParser.parse_station_list(xml_string)
 
     get_fully_matching(station_list, user_input_map)
@@ -115,10 +118,6 @@ defmodule NOAA.Station do
     nil
   end
 
-  defp remove_nils(list) do
-    Enum.filter(list, &(&1 != nil))
-  end
-
   defp match_abbr_to_state(abbr) do
     abbr_to_state = %{
       "AL" => "Alabama",
@@ -138,7 +137,7 @@ defmodule NOAA.Station do
       "IN" => "Indiana",
       "IA" => "Iowa",
       "KS" => "Kansas",
-      "US" => "Kentucky",
+      "KY" => "Kentucky",
       "LA" => "Louisiana",
       "ME" => "Maine",
       "MD" => "Maryland",

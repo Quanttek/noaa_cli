@@ -2,10 +2,10 @@ defmodule StationTest do
   use ExUnit.Case
   #doctest Noaa
 
-  import NOAA.Station, only: [parse_keywords: 2,
+  import Noaa.Station, only: [parse_keywords: 2,
                               get_key_matching: 2,
                               get_fully_matching: 2]
-  alias NOAA.Station
+  alias Noaa.Station
 
   def station_list do
     [%Station{id: "CWAV", state: "AB", name: "Sundre",

@@ -1,14 +1,16 @@
-defmodule NOAA.Weather do
-  alias NOAA.Station
-  alias NOAA.XMLParser
-  alias NOAA.Weather
+defmodule Noaa.Weather do
+  import Noaa.WebHandler, only: [fetch: 1,
+                                 decode_response: 1]
+
+  alias Noaa.Station
+  alias Noaa.XMLParser
 
   defstruct [last_updated: "", weather: "", temp: "", humidity: "",
              wind: "", msl_pressure: ""]
 
   def get_struct(%Station{id: id}) do
-    {:ok, weather_html} = NOAA.WebHandler.fetch(id)
-    XMLParser.parse_station(weather_html)
+    weather_xml = fetch(id) |> decode_response()
+    XMLParser.parse_station(weather_xml)
   end
 
   def get_emoji(weather) do #This is so ugly

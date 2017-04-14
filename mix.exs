@@ -8,6 +8,7 @@ defmodule Noaa.Mixfile do
      name: "NOAA CLI Weather",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     escript: escript_config(),
      deps: deps()]
   end
 
@@ -34,5 +35,9 @@ defmodule Noaa.Mixfile do
       {:sweet_xml, "~> 0.6.5"},
       {:ex_doc, "~> 0.15.0"}
     ]
+  end
+
+  defp escript_config do
+    [main_module: Noaa.CLI]
   end
 end
