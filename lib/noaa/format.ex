@@ -24,10 +24,12 @@ defmodule Noaa.Format do
   end
 
   def create_table(station_list) when is_list(station_list) do
-    station_list
-    |> create_station_list()
-    |> fix_cell_widths()
-    |> add_header()
+    list = create_station_list(station_list)
+    widths = get_column_widths(list, Keyword.values(@labels_station))
+
+    list
+    |> fix_cell_widths(widths, [[:right]])
+    |> add_header(widths)
     |> create_row_list()
     |> Enum.join("\n")
   end
@@ -69,12 +71,12 @@ defmodule Noaa.Format do
   end
 
 
-  def fix_cell_widths(table_list, directions_table \\ [[:right]]) do
-    widths = get_column_widths(table_list)
-    do_fix_cell_widths(table_list, widths, directions_table)
+  def fix_cell_widths(table_list, directions_table) do
+    widths = get_column_widths(table_list, [])
+    fix_cell_widths(table_list, widths, directions_table)
   end
 
-  defp do_fix_cell_widths(table_list, widths, directions_table) do
+  def fix_cell_widths(table_list, widths, directions_table) do
     directions_table = stretch_list_with_last_elem(directions_table, length(table_list))
 
     row_list = Enum.zip(table_list, directions_table)
@@ -83,6 +85,7 @@ defmodule Noaa.Format do
     end)
   end
 
+#Recursive alternative
 #  defp do_fix_cell_widths([row], widths, direction_s) do
 #    {directions_row, _direction_s} = List.pop_at(direction_s, 0)#
 
@@ -120,13 +123,13 @@ defmodule Noaa.Format do
   end
 
 
-  def add_header(station_list) do
-    keys = %Noaa.Station{} |> Map.from_struct() |> Map.keys()
-    widths = station_list |> List.first() |> Enum.map(&String.length/1)
+  def add_header(station_list, widths) do
+    padded_header =
+      @labels_station
+      |> Keyword.values()
+      |> fix_cell_widths_of_row(widths, [:right])
 
-    [Enum.map(keys, &(@labels_station[&1])),
-     get_header_separator(widths),
-     station_list]
+    [padded_header, get_header_separator(widths) | station_list]
   end
 
   def add_header(weather_list, station = %Station{}, weather_string) do
@@ -153,14 +156,27 @@ defmodule Noaa.Format do
   end
 
 
-  def get_column_widths(table_list) do
-    column_widths = get_max_column_widths(table_list)
-    separator_space = (length(column_widths) - 1) * String.length(@col_separator)
-    new_last_width = (List.last(column_widths) + Enum.reduce(column_widths, @total_width, &(&2 - &1))) - separator_space #Factor in separator space
+  def get_column_widths(table_list, header) do
+    column_widths =
+      case header do
+        [] -> get_max_column_widths(table_list)
+        h  -> get_max_column_widths([h | table_list])
+    end
 
-    if new_last_width <= List.last(column_widths),
-      do: List.replace_at(column_widths, length(column_widths) - 1, new_last_width),
+    separator_space = (length(column_widths) - 1) * String.length(@col_separator)
+
+    max_width_index =  Enum.find_index(column_widths, &(&1 == Enum.max(column_widths)))
+    new_max_width = (Enum.at(column_widths, max_width_index) + Enum.reduce(column_widths, @total_width, &(&2 - &1))) - separator_space
+
+    if new_max_width <= Enum.at(column_widths, max_width_index),
+      do: List.replace_at(column_widths, max_width_index, new_max_width),
     else: column_widths
+
+#    new_last_width = (List.last(column_widths) + Enum.reduce(column_widths, @total_width, &(&2 - &1))) - separator_space #Factor in separator space
+
+#    if new_last_width <= List.last(column_widths),
+#      do: List.replace_at(column_widths, length(column_widths) - 1, new_last_width),
+#    else: column_widths
   end
 
   defp get_max_column_widths(table_list) do
@@ -189,8 +205,8 @@ defmodule Noaa.Format do
     if length >= String.length(string) do
       String.pad_trailing(string, length)
     else
-      {_left, right} = String.split_at(string, length)
-      right
+      {left, _right} = String.split_at(string, length)
+      left
     end
   end
 
@@ -198,8 +214,8 @@ defmodule Noaa.Format do
     if length >= String.length(string) do
       String.pad_leading(string, length)
     else
-      {left, _right} = String.split_at(string, -length)
-      left
+      {_left, right} = String.split_at(string, -length)
+      right
     end
   end
 

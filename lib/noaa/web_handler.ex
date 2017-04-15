@@ -5,7 +5,7 @@ defmodule Noaa.WebHandler do
   @noaa_url Application.get_env(:noaa, :noaa_url)
 
   def fetch(id) do
-    Logger.info("Fetching data for #{id} station")
+    Logger.info("Fetching weather for #{id} station")
     xml_url(id)
     |> HTTPoison.get(@user_agent)
     |> handle_response

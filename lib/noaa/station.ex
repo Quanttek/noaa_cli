@@ -91,7 +91,7 @@ defmodule Noaa.Station do
   defp match_for_key_value(station = %Station{}, [state: user_value]) do
     state = station.state
     cond do
-      state == user_value and String.length(user_value) == 2 #When the user uses state abbreviations
+      String.length(user_value) == 2 and state == user_value #When the user uses state abbreviations
         -> station
       match_abbr_to_state(station.state) == user_value
         -> station

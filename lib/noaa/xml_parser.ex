@@ -72,17 +72,11 @@ defmodule Noaa.XMLParser do
     else: List.to_integer(list)
   end
 
-  defp string_to_num(string) when is_bitstring(string) do
-    if String.contains?(string, "."),
-      do: String.to_float(string),
-    else: String.to_integer(string)
-  end
-
-  defp delete_string_section(string, start, stop) do
-    with {left, _right} <- String.split_at(string, start),
-         {_left, right} <- String.split_at(string, stop),
-         do: left <> right
-  end
+#  defp string_to_num(string) when is_bitstring(string) do
+#    if String.contains?(string, "."),
+#      do: String.to_float(string),
+#    else: String.to_integer(string)
+#  end
 
   defp del_half(string, pattern, :left) do
     [_left, right] = String.split(string, pattern)

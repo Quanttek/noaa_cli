@@ -1,7 +1,7 @@
 defmodule FormatTest do
   use ExUnit.Case
 
-  import Noaa.Format, only: [fix_cell_widths: 1,
+  import Noaa.Format, only: [fix_cell_widths: 2,
                              create_station_list: 1,
                              create_weather_list: 1,
                              create_table: 1]
@@ -24,6 +24,25 @@ defmodule FormatTest do
       Temp. (°F) | 54.0\s\s\s\s\s\s\s
     Humidity (%) | 88\s\s\s\s\s\s\s\s\s
             Wind | Calm\s\s\s\s\s\s\s
+    """
+
+    assert((create_table(list) <> "\n") == expected_result)
+  end
+
+  test "Create correct station list" do
+    list = [%Station{id: "KFME", state: "MD", name: "Fort Meade / Tipton",
+                     latitude: 39.08333, longitude: -76.76667},
+            %Station{id: "KMTN", state: "MD", name: "Baltimore / Martin",
+                     latitude: 39.33333, longitude: -76.41667},
+            %Station{id: "KMSO", state: "MT", name: "Missoula, Missoula International Airport",
+                     latitude: 46.92083, longitude: -114.0925}]
+
+    expected_result = """
+    #    | Name                                     | State | Latitude   | Longitude\s
+    -----+------------------------------------------+-------+------------+-----------
+    KFME | Fort Meade / Tipton                      | MD    | 39.08333 N | 76.76667 W
+    KMTN | Baltimore / Martin                       | MD    | 39.33333 N | 76.41667 W
+    KMSO | Missoula, Missoula International Airport | MT    | 46.92083 N | 114.0925 W
     """
 
     assert((create_table(list) <> "\n") == expected_result)
@@ -79,6 +98,6 @@ defmodule FormatTest do
                        ["1234567   ", "1234567890", "123456  "],
                        ["1234567890", "1234      ", "1234567 "]]
 
-    assert(fix_cell_widths(table_list) == expected_result)
+    assert(fix_cell_widths(table_list, [[:right]]) == expected_result)
   end
 end

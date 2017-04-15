@@ -5,13 +5,13 @@ defmodule Noaa do
   require Logger
 
   def decide_output([station = %Station{}]) do
-    Logger.info "Only one station matched. Getting weather..."
+    Logger.info("Only one station matched. Getting weather...")
     weather = Weather.get_struct(station)
     [station, weather]
   end
 
   def decide_output([]) do
-    Logger.error "Could not find any stations matching your criteria!"
+    IO.puts "Could not find any stations matching your criteria"
     System.halt(2)
   end
 
