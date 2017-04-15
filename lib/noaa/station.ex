@@ -7,7 +7,7 @@ defmodule Noaa.Station do
 
   require Logger
 
-  defstruct [id: "", name: "", state: "", latitude: 0.0, longitude: 0.0]
+  defstruct [:id, :name, :state, :latitude, :longitude]
 
   #TODO: Refactor: Don't return partially filled station, but instead a map
   def parse_keywords([], struct = %Station{}) do
@@ -34,7 +34,7 @@ defmodule Noaa.Station do
   def get_matching(user_input_struct = %Station{}) do
     user_input_struct
     |> Map.from_struct()
-    |> Enum.filter(fn {_key, value} -> not value in ["", 0.0] end)
+    |> Enum.filter(fn {_key, value} -> value != nil end)
     |> Enum.into(%{})
     |> match_user_input_to_stations()
   end

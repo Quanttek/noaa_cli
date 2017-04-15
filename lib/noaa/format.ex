@@ -38,7 +38,7 @@ defmodule Noaa.Format do
     @labels_weather
     |> Keyword.keys()
     |> Enum.map(&( [&1, Map.fetch!(weather, &1)] )) #label-value pair
-    |> Enum.filter(fn([_key, value]) -> value != nil end)
+    |> Enum.filter(fn([_key, value]) -> value != nil and value != "" end)
     |> add_labels()
   end
 

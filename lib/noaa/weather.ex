@@ -5,8 +5,7 @@ defmodule Noaa.Weather do
   alias Noaa.Station
   alias Noaa.XMLParser
 
-  defstruct [last_updated: "", weather: "", temp: "", humidity: "",
-             wind: "", msl_pressure: ""]
+  defstruct [:last_updated, :weather, :temp, :humidity, :wind, :msl_pressure]
 
   def get_struct(%Station{id: id}) do
     weather_xml = fetch(id) |> decode_response()

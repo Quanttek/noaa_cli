@@ -15,8 +15,8 @@ defmodule CliTest do
     input2 = ["-s", "AB", "--latitude", "75", "-g", "-100"]
 
     expected_result1 = %Station{id: "ABC", state: "AB", name: "ABDEFG",
-                                latitude: 0.0, longitude: 0.0}
-    expected_result2 = %Station{id: "", state: "AB", name: "",
+                                latitude: nil, longitude: nil}
+    expected_result2 = %Station{id: nil, state: "AB", name: nil,
                                 latitude: 75, longitude: -100}
 
     assert(parse_args(input1) == expected_result1)
@@ -28,8 +28,8 @@ defmodule CliTest do
     input2 = ["-s", "AB", "--latitude", "75", "-g", "-100", "ABCDEFGH"]
 
     expected_result1 = %Station{id: "ABC", state: "AB", name: "ABDEFG",
-                                latitude: 0.0, longitude: 0.0}
-    expected_result2 = %Station{id: "", state: "AB", name: "ABCDEFGH",
+                                latitude: nil, longitude: nil}
+    expected_result2 = %Station{id: nil, state: "AB", name: "ABCDEFGH",
                                 latitude: 75, longitude: -100}
 
     assert(parse_args(input1) == expected_result1)

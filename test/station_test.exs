@@ -29,8 +29,8 @@ defmodule StationTest do
   test "Get correcty partially filled %Station{} from user input (1/2)" do
     user_input = [id: "ABCD", state: "BC"]
 
-    expected_result = %Station{id: "ABCD", state: "BC", name: "",
-                               latitude: 0.0, longitude: 0.0}
+    expected_result = %Station{id: "ABCD", state: "BC", name: nil,
+                               latitude: nil, longitude: nil}
 
     assert(parse_keywords(user_input, %Station{}) == expected_result)
   end
@@ -38,7 +38,7 @@ defmodule StationTest do
   test "Get correcty partially filled %Station{} from user input (2/2)" do
     user_input = [latitude: 75.1, longitude: -100]
 
-    expected_result = %Station{id: "", state: "", name: "",
+    expected_result = %Station{id: nil, state: nil, name: nil,
                                latitude: 75.1, longitude: -100}
 
     assert(parse_keywords(user_input, %Station{}) == expected_result)
@@ -47,8 +47,8 @@ defmodule StationTest do
   test "Get empty %Station{} from no user input" do
     user_input = []
 
-    expected_result = %Station{id: "", state: "", name: "",
-                               latitude: 0.0, longitude: 0.0}
+    expected_result = %Station{id: nil, state: nil, name: nil,
+                               latitude: nil, longitude: nil}
 
     assert(parse_keywords(user_input, %Station{}) == expected_result)
   end
